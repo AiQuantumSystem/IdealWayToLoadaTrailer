@@ -1,0 +1,50 @@
+# Function to calculate the optimal number of double and single stacked pallets
+def optimize_pallet_loading(total_pallets):
+    MAX_SPOTS = 26
+    MAX_CAPACITY = 52
+
+    results = []
+    full_trailers = total_pallets // MAX_CAPACITY
+    remaining_pallets = total_pallets % MAX_CAPACITY
+
+    # Add fully loaded trailers
+    for _ in range(full_trailers):
+        results.append({'double_stacked': MAX_SPOTS, 'single_stacked': 0, 'total_loaded': MAX_CAPACITY})
+
+    if remaining_pallets > 0:
+        # Calculate loading for the last trailer
+        double_stacked = min(remaining_pallets // 2, MAX_SPOTS)
+        single_stacked = remaining_pallets - double_stacked * 2
+
+        # Fill remaining spots with single-stacked if double-stacked is not enough
+        while double_stacked + single_stacked < MAX_SPOTS and double_stacked > 0:
+            double_stacked -= 1
+            single_stacked += 2
+
+        total_loaded = double_stacked * 2 + single_stacked
+        results.append({
+            'double_stacked': double_stacked,
+            'single_stacked': single_stacked,
+            'total_loaded': total_loaded
+        })
+
+    return results
+    
+# CLI to interact with the optimize function
+def pallet_loading_cli():
+    print("Welcome to the Pallet Loading Optimizer")
+    total_pallets = int(input("Enter the total number of pallets: "))
+    
+    if total_pallets < 0:
+        print("The number of pallets cannot be negative.")
+    else:
+        trailer_results = optimize_pallet_loading(total_pallets)
+
+        for i, result in enumerate(trailer_results, start=1):
+            print(f"\nTrailer {i}")
+            print(f"- Double Stacked Spots: {result['double_stacked']}")
+            print(f"- Single Stacked Spots: {result['single_stacked']}")
+            print(f"- Total Pallets Loaded: {result['total_loaded']}")
+
+# Run the CLI
+pallet_loading_cli()
